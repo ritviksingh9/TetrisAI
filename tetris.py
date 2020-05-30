@@ -179,9 +179,8 @@ def evaluate_move(weights, board, piece_array):
     best_x = 0
     best_score = float('-inf')
     best_params = [0, 0, 0, 0]
-    print("NEW PIECE")
     for i in range(0, 4):
-        for x in range(0, BOARDX-1):
+        for x in range(-1, BOARDX-1):
             params = [0, 0, 0, 0]
             sample_board = [row[:] for row in board]
             y = 0
