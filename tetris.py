@@ -261,12 +261,12 @@ def norm_vector(v):
         v[i] /= length
 
 def train():
-    population = 10
-    num_games = 10
+    population = 50
+    num_games = 15
     vectors = []
     average_score = [0]*population
     sub_group_portion = 2
-    num_generations = 20
+    num_generations = 80
     mutation_chance = 7 #percent
 
     #initializing the genomes
