@@ -13,27 +13,29 @@ level = 0
 lines_per_level = 0
 
 def display_board(board, x, y, piece_array, score, shadow_y, DISPLAY):
-    for i in range(0, BOARDY):
-        for j in range(0, BOARDX):
+    piece_to_color = {0: (0, 0, 0), 1: (0, 255, 255), 2: (0, 0, 255), 3: (255, 128, 0), 4: (255, 255, 0), 5: (114, 203, 59), 6: (255, 0, 255), 7:(255, 0, 0)}
+
+    for i in range(0, BOARDY-1):
+        for j in range(1, BOARDX-1):
             if not board[i][j]:
-                if i-y >= 0 and i-y < 4 and j-x >= 0 and j-x < 4 and piece_array[i-y][j-x] == 1:
-                    pygame.draw.rect(DISPLAY,(255, 255, 255),(x_top_left+j*BLOCKSIZE, y_top_left+i*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))
-                elif i-shadow_y >= 0 and i-shadow_y < 4 and j-x >= 0 and j-x < 4 and piece_array[i-shadow_y][j-x] == 1:
-                    pygame.draw.rect(DISPLAY,(128, 128, 128),(x_top_left+j*BLOCKSIZE, y_top_left+i*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))
+                if i-y >= 0 and i-y < 4 and j-x >= 0 and j-x < 4 and piece_array[i-y][j-x] != 0:
+                    pygame.draw.rect(DISPLAY,piece_to_color[piece_array[i-y][j-x]],(x_top_left+j*BLOCKSIZE, y_top_left+i*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))
+                elif i-shadow_y >= 0 and i-shadow_y < 4 and j-x >= 0 and j-x < 4 and piece_array[i-shadow_y][j-x] != 0:
+                    pygame.draw.rect(DISPLAY,piece_to_color[piece_array[i-shadow_y][j-x]],(x_top_left+j*BLOCKSIZE, y_top_left+i*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE), 1)
                 else:
                     pygame.draw.rect(DISPLAY,(0, 0, 0),(x_top_left+j*BLOCKSIZE, y_top_left+i*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))    
-            elif board[i][j] == 1:
-                pygame.draw.rect(DISPLAY,(255, 255, 255),(x_top_left+j*BLOCKSIZE, y_top_left+i*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))
+            else: 
+                pygame.draw.rect(DISPLAY,piece_to_color[board[i][j]],(x_top_left+j*BLOCKSIZE, y_top_left+i*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))
 
 def init_board():
     board = []
     for i in range (0, BOARDY):
         board.append([0]*BOARDX)
-        board[i][0] = 2
-        board[i][BOARDX-1] = 2
+        board[i][0] = 8
+        board[i][BOARDX-1] = 8
     
     for i in range(0, BOARDX):
-        board[BOARDY-1][i] = 2
+        board[BOARDY-1][i] = 8
     
     return board
 
@@ -75,35 +77,35 @@ def gen_piece(piece_array, piece_tracker):
         piece_array[2][1] = 1
         piece_array[3][1] = 1
     if(piece == 1):
-        piece_array[0][0] = 1
-        piece_array[1][0] = 1
-        piece_array[1][1] = 1
-        piece_array[1][2] = 1
+        piece_array[0][0] = 2
+        piece_array[1][0] = 2
+        piece_array[1][1] = 2
+        piece_array[1][2] = 2
     if(piece == 2):
-        piece_array[0][2] = 1
-        piece_array[1][0] = 1
-        piece_array[1][1] = 1
-        piece_array[1][2] = 1
+        piece_array[0][2] = 3
+        piece_array[1][0] = 3
+        piece_array[1][1] = 3
+        piece_array[1][2] = 3
     if(piece == 3):
-        piece_array[0][2] = 1
-        piece_array[0][3] = 1
-        piece_array[1][2] = 1
-        piece_array[1][3] = 1
+        piece_array[0][2] = 4
+        piece_array[0][3] = 4
+        piece_array[1][2] = 4
+        piece_array[1][3] = 4
     if(piece == 4):
-        piece_array[0][2] = 1
-        piece_array[0][3] = 1
-        piece_array[1][1] = 1
-        piece_array[1][2] = 1
+        piece_array[0][2] = 5
+        piece_array[0][3] = 5
+        piece_array[1][1] = 5
+        piece_array[1][2] = 5
     if(piece == 5):
-        piece_array[1][1] = 1
-        piece_array[1][2] = 1
-        piece_array[1][3] = 1
-        piece_array[2][2] = 1
+        piece_array[1][1] = 6
+        piece_array[1][2] = 6
+        piece_array[1][3] = 6
+        piece_array[2][2] = 6
     if(piece == 6):
-        piece_array[0][1] = 1
-        piece_array[0][2] = 1
-        piece_array[1][2] = 1
-        piece_array[1][3] = 1
+        piece_array[0][1] = 7
+        piece_array[0][2] = 7
+        piece_array[1][2] = 7
+        piece_array[1][3] = 7
 
 def check_collision(piece_array, x, y, board):
     check = 0
@@ -113,7 +115,7 @@ def check_collision(piece_array, x, y, board):
     k = 0
     for i in range(0, len(piece_array)):
         for j in range(0, len(piece_array)):
-            if piece_array[i][j] == 1:
+            if piece_array[i][j] != 0:
                 squares[k][1] = i
                 squares[k][0] = j
                 k += 1
@@ -130,8 +132,8 @@ def check_collision(piece_array, x, y, board):
 def add_to_board(board, x, y, piece_array):
     for i in range(y, len(piece_array)+y):
         for j in range(x, len(piece_array)+x):
-            if(piece_array[i-y][j-x] == 1):
-                board[i][j] = 1           
+            if(piece_array[i-y][j-x] != 0):
+                board[i][j] = piece_array[i-y][j-x]           
 
 def check_lines(board, x, y):
     global lines_per_level
@@ -195,7 +197,7 @@ def evaluate_move(weights, board, piece_array):
                 bad_move = 0
                 for j in range(0, len(piece_array)):
                     for k in range(0, len(piece_array)):
-                        if piece[j][k] == 1 and k+x >= BOARDX-1:
+                        if piece[j][k] != 0 and k+x >= BOARDX-1:
                             bad_move = 1
                     
                 if not bad_move:
@@ -211,11 +213,11 @@ def evaluate_move(weights, board, piece_array):
     return (best_rotation, best_x)
 
 def calculate_params(board, params):
-    #aggregate height
+    #reseting params array
     for i in range(4):
         params[i] = 0
 
-    
+    #aggregate height
     for x in range(1, BOARDX-1):
         y = 0
         while board[y][x] == 0:
@@ -226,7 +228,7 @@ def calculate_params(board, params):
     for y in range(0, BOARDY-1):
         count = 0
         for x in range(1, BOARDX-1):
-            if board[y][x] == 1:
+            if board[y][x] != 0:
                 count += 1
         if count == BOARDX-2:
             params[1] += 1
@@ -339,14 +341,15 @@ def play(weights):
     piece_array = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
     x = 0
     y = 0
-    score = 1
+    score = 1 #initialize score to 1 to avoid zero vectors
     board = init_board()
+    piece_limit = 500 #to speed up training
 
     random.seed()
 
     moves = (0, 0)
 
-    while play_on and num_piece_generated < 500:
+    while play_on and num_piece_generated < piece_limit:
         if not piece_generated:
             gen_piece(piece_array, piece_tracker)
             piece_generated = 1
@@ -378,7 +381,7 @@ def print_board(board):
         for j in range(0, BOARDX):
             if(board[i][j] == 0):
                 print(" ", end="", flush=True)
-            elif(board[i][j] == 1):
+            elif(board[i][j] != 0 and board[i][j] != 8):
                 print("X", end="", flush=True)
             else:
                 print("#", end="", flush=True)
