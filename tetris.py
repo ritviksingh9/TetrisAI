@@ -160,7 +160,10 @@ def check_lines(board, x, y):
         for i in range(start_clear, -1, -1):
             for j in range(0, BOARDX):
                 board[i+lines][j] = board[i][j]
-    
+
+    #the following is used if training is done with the fitness function being the number of lines cleared instead of the score
+    #return lines
+
     if lines == 1:
         return (level+1)*40
     elif lines == 2:
@@ -261,13 +264,15 @@ def norm_vector(v):
         v[i] /= length
 
 def train():
-    population = 50
-    num_games = 15
+    population = 60
+    num_games = 20
     vectors = []
     average_score = [0]*population
-    sub_group_portion = 2
+    sub_group_portion = 3
     num_generations = 80
     mutation_chance = 7 #percent
+    best_fitness = 0
+    best_vector = [0]*4
 
     #initializing the genomes
     for i in range(0, population):
@@ -276,16 +281,15 @@ def train():
     print("STARTING TRAINING")
     for i in range(0, num_generations):
         average_score = [0]*population
-        print(average_score)
         #calculating the average score for each genome
         for j in range(0, population):
             for k in range(0, num_games):
                 average_score[j] += play(vectors[j])
             average_score[j] /= num_games
-        print(average_score)
+
         children = []
         #generating children by combining the genes of parents while also allowing for mutations
-        for j in range(0, 3 * population // sub_group_portion):
+        for j in range(0,  population // sub_group_portion):
             #weighted average of parents genes with respect to their performance
             sub_group = (random.sample(average_score, population // sub_group_portion))
             sub_group.sort(reverse=True)
@@ -304,14 +308,21 @@ def train():
 
         #getting rid of the lowest 30%
         vectors_2 = [x for _,x in sorted(zip(average_score,vectors), reverse=True)]
+        average_score.sort(reverse=True)
         vectors = [row[:] for row in vectors_2]
         del vectors[len(vectors)-len(children):]
 
         #adding in the children for the next generation
         for j in children:
             vectors.append(j)
+        if(average_score[0] > best_fitness):
+            best_fitness = average_score[0]
+            best_vector = vectors[0][:]
         print("GENERATION: {}   BEST FITNESS: {}".format(i, average_score[0]))
-        print(average_score)
+        print("TOP 5 GENOMES")
+        for j in range(5):
+            print(vectors[j])
+        #print(average_score)
 
     return vectors[0]
         
@@ -444,6 +455,7 @@ def play_animate(weights):
             else:
                 add_to_board(board, x, y, piece_array)
                 score += check_lines(board, x, y)
+                pygame.display.set_caption('SCORE: '+str(score))
                 piece_generated = 0
                 frame = 0
 
@@ -453,11 +465,8 @@ def play_animate(weights):
         if frame == 0:
             display_board(board, x, y, piece_array, score, shadow_y-1, DISPLAY)
             pygame.display.update()
-        clock.tick(30)
+        clock.tick(120)
     print(score)
 
 if __name__ == "__main__":
-    weights = [-0.51, 0.76, -0.36, -0.18]
-
-    play_animate(weights)
-
+    play_animate([-0.52, 0.55, -0.64, -0.15])
